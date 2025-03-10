@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank of India - Admin Dashboard</title>
+    <link rel="icon" href="Bank of India Logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .account-table { width: 100%; border-collapse: collapse; }
+        .account-table th, .account-table td { padding: 10px; border: 1px solid #ddd; }
+        .controls { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header>
+        <h1>Bank of India - Admin Dashboard</h1>
+        <button onclick="logout()" style="float: right;">Logout</button>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="internet-banking.html">Internet Banking</a></li>
+        </ul>
+    </nav>
+
+    <div class="controls">
+        <h2>All Accounts</h2>
+        <table class="account-table" id="accounts-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Balance</th>
+                    <th>Transactions</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="accounts-body"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Load accounts on page load
+        async function loadAccounts() {
+            try {
+                const response = await fetch('/api/admin/accounts');
+                const accounts = await response.json();
+                
+                const tbody = document.getElementById('accounts-body');
+                tbody.innerHTML = '';
+                
+                accounts.forEach(acc => {
+                    const row = `
+                        <tr>
+                            <td>${acc.username}</td>
+                            <td><input type="number" value="${acc.balance}" 
+                                  onchange="updateBalance('${acc.username}', this.value)"></td>
+                            <td><textarea onchange="updateTransactions('${acc.username}', this.value)">
+                                ${acc.transactions.join('\n')}
+                            </textarea></td>
+                            <td>
+                                <button onclick="deleteAccount('${acc.username}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                alert('Error loading accounts');
+            }
+        }
+
+        async function updateBalance(username, balance) {
+            await fetch('/api/admin/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, balance: Number(balance) })
+            });
+        }
+
+        async function updateTransactions(username, transactions) {
+            await fetch('/api/admin/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username, 
+                    transactions: transactions.split('\n') 
+                })
+            });
+        }
+
+        async function deleteAccount(username) {
+            if (confirm(`Delete ${username} permanently?`)) {
+                await fetch('/api/admin/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+                loadAccounts();
+            }
+        }
+
+        async function logout() {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = 'index.html';
+        }
+
+        // Initial load
+        loadAccounts();
+    </script>
+</body>
+</html>

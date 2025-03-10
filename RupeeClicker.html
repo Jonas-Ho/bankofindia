@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank of India - Secure Banking Solutions</title>
+    <link rel="icon" href="Bank of India Logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript" src="script.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .ClckerGame h1 {
+            color: #333;
+        }
+        #rupee-display {
+            font-size: 2em;
+            margin: 20px 0;
+        }
+        #click-button {
+            padding: 20px;
+            font-size: 1.5em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #click-button:active {
+            background-color: #45a049;
+        }
+        .upgrade {
+            margin: 10px;
+            padding: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .upgrade:hover {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bank of India</h1>
+        <p>Trusted Banking Since 1947</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="banking_services.html">Services</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="internet-banking.html">Internet Banking</a></li>
+        </ul>
+    </nav>
+
+    <section class="ClickerGame">
+        <main>
+            <br>
+            <h1>Indian Rupee Clicker</h1>
+            <div id="rupee-display">Rupees: 0</div>
+            <button id="click-button">Click Me!</button>
+            <p>RPS: Rupees earned per second (Automatically)</p>
+            <p>RPC: Rupees earned per click</p>
+            <div id="upgrades">
+                <!-- Upgrades will be dynamically generated here -->
+            </div>
+        </main>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <strong>Disclaimer:</strong> This is a <strong>demo website</strong> for educational and demonstration purposes only. 
+        All data, including account information, balances, and transactions, is <strong>fictional</strong> and not connected to any real financial institution. 
+        No real money or sensitive information is involved. 
+        Do not enter any real personal or financial details.
+        </div>
+        <p style="text-align: center; margin-top: 1rem;">© 2025 Bank of India. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+
+    <script>
+        let rupees = 0;
+        let rupeesPerSecond = 0;
+        let rupeesPerClick = 1; // Base RPC
+
+        // Upgrade data: [name, baseCost, costIncrease, rpsIncrease, rpcIncrease]
+        const upgrades = [
+            { name: "Worker", baseCost: 10, costIncrease: 0.05, rpsIncrease: 1, rpcIncrease: 0 },
+            { name: "Farm", baseCost: 300, costIncrease: 0.05, rpsIncrease: 5, rpcIncrease: 1 },
+            { name: "Factory", baseCost: 10000, costIncrease: 0.10, rpsIncrease: 20, rpcIncrease: 5 },
+            { name: "Bank", baseCost: 100000, costIncrease: 0.25, rpsIncrease: 100, rpcIncrease: 10 },
+            { name: "Army", baseCost: 100000000, costIncrease: 0.15, rpsIncrease: 750, rpcIncrease: 200 },
+            { name: "Kingdom", baseCost: 100000000000, costIncrease: 0.15, rpsIncrease: 2000, rpcIncrease: 750 },
+            { name: "Empire", baseCost: 100000000000000, costIncrease: 0.10, rpsIncrease: 6000, rpcIncrease: 1000 },
+            { name: "Era", baseCost: 500000000000000, costIncrease: 0.05, rpsIncrease: 10000, rpcIncrease: 5000 },
+            { name: "Age of Rupees", baseCost: 1000000000000000000000, costIncrease: 0.50, rpsIncrease: 250000, rpcIncrease: 50000 },
+            { name: "Rupeeful", baseCost: 1000000000000000000000, costIncrease: 0.75, rpsIncrease: 12500000, rpcIncrease: 5000000 }
+        ];
+
+        // Track how many of each upgrade has been purchased
+        const upgradeCounts = new Array(upgrades.length).fill(0);
+
+        // Function to update the rupee display
+        function updateDisplay() {
+            document.getElementById('rupee-display').innerText = `Rupees: ${rupees}`;
+        }
+
+        // Function to earn rupees
+        function earnRupees(amount) {
+            rupees += amount;
+            updateDisplay();
+        }
+
+        // Function to calculate the current cost of an upgrade
+        function getUpgradeCost(index) {
+            const upgrade = upgrades[index];
+            return upgrade.baseCost * Math.pow(1 + upgrade.costIncrease, upgradeCounts[index]);
+        }
+
+        // Function to buy an upgrade
+        function buyUpgrade(index) {
+            const upgrade = upgrades[index];
+            const cost = getUpgradeCost(index);
+            if (rupees >= cost) {
+                rupees -= cost;
+                rupeesPerSecond += upgrade.rpsIncrease;
+                rupeesPerClick += upgrade.rpcIncrease;
+                upgradeCounts[index]++;
+                updateDisplay();
+                alert(`${upgrade.name} purchased! You now earn ${upgrade.rpsIncrease} more RPS and ${upgrade.rpcIncrease} more RPC.`);
+            } else {
+                alert('Not enough Rupees!');
+            }
+        }
+
+        // Generate upgrade buttons dynamically
+        const upgradesContainer = document.getElementById('upgrades');
+        upgrades.forEach((upgrade, index) => {
+            const upgradeDiv = document.createElement('div');
+            upgradeDiv.className = 'upgrade';
+            upgradeDiv.innerText = `${upgrade.name}: +${upgrade.rpsIncrease} RPS, +${upgrade.rpcIncrease} RPC (Cost: ${getUpgradeCost(index).toLocaleString()} Rupees)`;
+            upgradeDiv.onclick = () => buyUpgrade(index);
+            upgradesContainer.appendChild(upgradeDiv);
+        });
+
+        // Click button event
+        document.getElementById('click-button').addEventListener('click', () => {
+            earnRupees(rupeesPerClick);
+        });
+
+        // Automatically earn rupees every second
+        setInterval(() => {
+            earnRupees(rupeesPerSecond);
+        }, 1000);
+    </script>
+</body>
+</html>
